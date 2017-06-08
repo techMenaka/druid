@@ -1,0 +1,59 @@
+{
+  "dataSources" : {
+    "logintable" : {
+      "spec" : {
+        "dataSchema" : {
+          "dataSource" : "logintable",
+          "parser" : {
+            "type" : "string",
+            "parseSpec" : {
+              "timestampSpec" : {
+                "column" : "logints",
+                "format" : "auto"
+              },
+              "dimensionsSpec" : {
+                "dimensions" : [],
+                "dimensionExclusions" : [
+                  "timestamp",
+                  "value"
+                ]
+              },
+              "format" : "json"
+            }
+          },
+          "granularitySpec" : {
+            "type" : "uniform",
+            "segmentGranularity" : "hour",
+            "queryGranularity" : "none"
+          },
+          "metricsSpec" : [
+            {
+              "type" : "count",
+              "name" : "count"
+            }
+          ]
+        },
+        "ioConfig" : {
+          "type" : "realtime"
+        },
+        "tuningConfig" : {
+          "type" : "realtime",
+          "maxRowsInMemory" : "100000",
+          "intermediatePersistPeriod" : "PT10M",
+          "windowPeriod" : "PT10M"
+        }
+      },
+      "properties" : {
+        "task.partitions" : "1",
+        "task.replicants" : "1"
+      }
+    }
+  },
+  "properties" : {
+    "zookeeper.connect" : "localhost",
+    "druid.discovery.curator.path" : "/druid/discovery",
+    "druid.selectors.indexing.serviceName" : "druid/overlord",
+    "http.port" : "8200",
+    "http.threads" : "9"
+  }
+}
