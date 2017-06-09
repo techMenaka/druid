@@ -5,6 +5,8 @@ package com.tgt.estore.druid.client;
  */
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.metamx.common.Granularity;
@@ -59,59 +61,57 @@ public class TranquilityClient {
     public static final String FLATTEN_PROP_NAME = "flatten";
     public static final String SYNC_PROP_NAME = "sync";
 
+    private static ObjectMapper druidObjectMapper = new ObjectMapper();
 
-    public static void sentMessageOverHTTP() {
+    public static void sentMessageOverHTTP1() {
         // Read config from "example.json" on the classpath.
         final InputStream configStream = TranquilityClient.class.getClassLoader().getResourceAsStream("loginserver.json");
         final TranquilityConfig<PropertiesBasedConfig> config = TranquilityConfig.read(configStream);
-        final DataSourceConfig<PropertiesBasedConfig> loginConfig = config.getDataSource("logintable");
-        final Tranquilizer<Map<String, Object>> sender = DruidBeams.fromConfig(loginConfig)
-                .buildTranquilizer(loginConfig.tranquilizerBuilder());
+        final DataSourceConfig<PropertiesBasedConfig> wikipediaConfig = config.getDataSource("wikipedia");
+        final Tranquilizer<Map<String, Object>> sender = DruidBeams.fromConfig(wikipediaConfig)
+                .buildTranquilizer(wikipediaConfig.tranquilizerBuilder());
 
         sender.start();
 
         try {
             // Send 10000 objects
 
-            String status;
-
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 10000; i++) {
                 // Build a sample event to send; make sure we use a current date
-
-                if (i%2==0) {
-                    status="LoggedIn";
-                } else{
-                    status="LoggedOut";
-                }
                 final Map<String, Object> obj = ImmutableMap.<String, Object>of(
-                        "logints", new DateTime().toString(),
-                        "targetguid", i,
-                        "status", status
+                        "timestamp", new DateTime().toString(),
+                        "page", "foo",
+                        "added", i
                 );
 
                 // Asynchronously send event to Druid:
                 sender.send(obj).addEventListener(
-                        new FutureEventListener<BoxedUnit>() {
+                        new FutureEventListener<BoxedUnit>()
+                        {
                             @Override
-                            public void onSuccess(BoxedUnit value) {
-                                System.err.println("Sent message:"+ obj);
+                            public void onSuccess(BoxedUnit value)
+                            {
+                                log.info("Sent message: %s", obj);
                             }
 
                             @Override
-                            public void onFailure(Throwable e) {
+                            public void onFailure(Throwable e)
+                            {
                                 if (e instanceof MessageDroppedException) {
-                                    System.err.println(e + "Dropped message: " + obj);
+                                    log.warn(e, "Dropped message: %s", obj);
                                 } else {
-                                    System.err.println(e + "Failed to send message: " + obj);
+                                    log.error(e, "Failed to send message: %s", obj);
                                 }
                             }
                         }
                 );
             }
-        } finally {
+        }
+        finally {
             sender.flush();
             sender.stop();
         }
+
     }
 
     public static void sentMessageOverHTTP2() {
@@ -154,6 +154,7 @@ public class TranquilityClient {
 
      //   ArbitraryGranularitySpec day = new ArbitraryGranularitySpec(QueryGranularity.fromString("DAY"), ImmutableList.of(parse("2014/2015")));
 
+        druidObjectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         final Tranquilizer<Map<String, Object>> druidService = DruidBeams
                 .builder(timestamper)
                 .curator(curator)
@@ -164,7 +165,7 @@ public class TranquilityClient {
                 .tuning(
                         ClusteredBeamTuning
                                 .builder()
-                                .segmentGranularity(Granularity.MINUTE)
+                                .segmentGranularity(Granularity.YEAR)
                                 .windowPeriod(new Period("PT10M"))
                                 .partitions(1)
                                 .replicants(1)

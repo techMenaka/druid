@@ -1,59 +1,78 @@
 {
-  "dataSources" : {
-    "logintable" : {
-      "spec" : {
-        "dataSchema" : {
-          "dataSource" : "logintable",
-          "parser" : {
-            "type" : "string",
-            "parseSpec" : {
-              "timestampSpec" : {
-                "column" : "logints",
-                "format" : "auto"
+  "dataSources": [
+    {
+      "spec": {
+        "dataSchema": {
+          "dataSource": "wikipedia",
+          "parser": {
+            "type": "string",
+            "parseSpec": {
+              "format": "json",
+              "timestampSpec": {
+                "column": "timestamp",
+                "format": "auto"
               },
-              "dimensionsSpec" : {
-                "dimensions" : [],
-                "dimensionExclusions" : [
-                  "timestamp",
-                  "value"
-                ]
-              },
-              "format" : "json"
+              "dimensionsSpec": {
+                "dimensions": [
+                  "page",
+                  "language",
+                  "user",
+                  "unpatrolled",
+                  "newPage",
+                  "robot",
+                  "anonymous",
+                  "namespace",
+                  "continent",
+                  "country",
+                  "region",
+                  "city"
+                ],
+                "dimensionExclusions": [],
+                "spatialDimensions": []
+              }
             }
           },
-          "granularitySpec" : {
-            "type" : "uniform",
-            "segmentGranularity" : "hour",
-            "queryGranularity" : "none"
-          },
-          "metricsSpec" : [
+          "metricsSpec": [
             {
-              "type" : "count",
-              "name" : "count"
+              "type": "count",
+              "name": "count"
+            },
+            {
+              "type": "doubleSum",
+              "name": "added",
+              "fieldName": "added"
+            },
+            {
+              "type": "doubleSum",
+              "name": "deleted",
+              "fieldName": "deleted"
+            },
+            {
+              "type": "doubleSum",
+              "name": "delta",
+              "fieldName": "delta"
             }
-          ]
+          ],
+          "granularitySpec": {
+            "type": "uniform",
+            "segmentGranularity": "DAY",
+            "queryGranularity": "NONE"
+          }
         },
-        "ioConfig" : {
-          "type" : "realtime"
-        },
-        "tuningConfig" : {
-          "type" : "realtime",
-          "maxRowsInMemory" : "100000",
-          "intermediatePersistPeriod" : "PT10M",
-          "windowPeriod" : "PT10M"
+        "tuningConfig": {
+          "type": "realtime",
+          "maxRowsInMemory": 100000,
+          "intermediatePersistPeriod": "PT10m",
+          "windowPeriod": "PT10M"
         }
-      },
-      "properties" : {
-        "task.partitions" : "1",
-        "task.replicants" : "1"
       }
     }
-  },
-  "properties" : {
-    "zookeeper.connect" : "localhost",
-    "druid.discovery.curator.path" : "/druid/discovery",
-    "druid.selectors.indexing.serviceName" : "druid/overlord",
-    "http.port" : "8200",
-    "http.threads" : "9"
+  ],
+  "properties": {
+    "zookeeper.connect": "localhost:2181",
+    "druid.selectors.indexing.serviceName": "druid/overlord",
+    "druid.discovery.curator.path": "/druid/discovery",
+    "druidBeam.taskLocator": "overlord",
+    "druidBeam.overlordPollPeriod": "PT5S"
   }
 }

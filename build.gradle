@@ -26,8 +26,9 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('io.druid:druid-api:0.9.2')
-	compile('io.druid:druid-server:0.10.0')
-	compile('io.druid:tranquility-core_2.10:0.8.1')
+	compile('io.druid:druid-server:0.9.2')
+	compile('io.druid:tranquility-core_2.10:0.8.2')
+	compile('io.druid:druid-processing:0.9.2')
 	//compile('org.apache.maven.plugins:maven-enforcer-plugin:1.4.1')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')

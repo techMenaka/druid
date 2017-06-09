@@ -2,10 +2,10 @@ package com.tgt.estore.druid.util;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.metamx.common.guava.Sequence;
+import com.metamx.common.guava.Sequences;
 import com.tgt.estore.druid.client.CustomClient;
 import com.tgt.estore.druid.client.TranquilityClient;
-import io.druid.java.util.common.guava.Sequence;
-import io.druid.java.util.common.guava.Sequences;
 import io.druid.query.Druids;
 import io.druid.query.Result;
 import io.druid.query.filter.AndDimFilter;

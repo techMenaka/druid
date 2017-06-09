@@ -13,6 +13,7 @@ import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
+import com.metamx.common.guava.Sequence;
 import com.metamx.common.lifecycle.Lifecycle;
 import com.metamx.common.logger.Logger;
 import com.metamx.emitter.core.NoopEmitter;
@@ -28,7 +29,6 @@ import io.druid.guice.annotations.Self;
 import io.druid.guice.annotations.Smile;
 import io.druid.guice.http.DruidHttpClientConfig;
 import io.druid.initialization.Initialization;
-import io.druid.java.util.common.guava.Sequence;
 import io.druid.query.*;
 import io.druid.server.DruidNode;
 
