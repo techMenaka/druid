@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/query")
-public class DruidController {
+public class ProfileDruidResource {
 
     @Autowired
     DruidQueryService druidQueryService;
@@ -43,6 +43,5 @@ public class DruidController {
         druidQueryService.postTransInfo();
         return sb.toString();
     }
-
 
 }
